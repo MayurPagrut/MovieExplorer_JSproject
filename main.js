@@ -24,21 +24,52 @@ async function getPage(pageNum)
 
     const container = document.querySelector("#movieContainer");
     container.innerHTML=
-    myData.map(({Title,Year,Poster})=>{
+    myData.map(({Title,Year,Poster,imdbID})=>{
         return `<div class="movie-card">
          <img src="${Poster}">
          <h4>${Title}</h4>
          <p>${Year}</p>
+         <button onclick="viewMovie('${imdbID}')">
+        View Details
+    </button>
          </div>`;
     
     }).join("");
+}
+async function viewMovie(imdbID)
+{
+    const response = await fetch(
+      `https://www.omdbapi.com/?apikey=${apikey}&i=${imdbID}`
+    );
+
+    const movie = await response.json();
+    document.querySelector("#movieDetails").innerHTML = `
+    <h2>${movie.Title}</h2>
+    <img src="${movie.Poster}">
+
+    <p><strong>Year:</strong> ${movie.Year}</p>
+    <p><strong>Genre:</strong> ${movie.Genre}</p>
+    <p><strong>Runtime:</strong> ${movie.Runtime}</p>
+    <p><strong>Director:</strong> ${movie.Director}</p>
+    <p><strong>Actors:</strong> ${movie.Actors}</p>
+    <p><strong>IMDb Rating:</strong> ${movie.imdbRating}</p>
+    <p><strong>Plot:</strong> ${movie.Plot}</p>
+`;
+
+    console.log(movie);
+    document.querySelector("#movieModal").style.display =
+"block";
+document.querySelector("#closeModal")
+.addEventListener("click",()=>{
+    document.querySelector("#movieModal").style.display =
+    "none";
+});
 }
 
 const button= document.querySelector("#searchBtn");
 button.addEventListener("click",async ()=>{
     currentTitle=document.querySelector("#movieInput").value;
     pageNum = 1;
-
         getPage(pageNum);
 });
 document.querySelector("#categorySelect")
